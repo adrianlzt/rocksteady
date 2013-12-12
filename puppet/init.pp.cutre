@@ -1,0 +1,122 @@
+Exec {
+  path => '/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin',
+}
+# Uso apache en vez de nginx que no lo entiendo muy bien
+#$packages = ['screen','collectd','python-pip','gcc','libpython2.7','python-cairo-dev','python-django','python-django-tagging','python-twisted','nginx','uwsgi','uwsgi-plugin-python' ]
+$packages = ['screen','collectd','python-pip','gcc','libpython2.7','python-cairo-dev','python-django','python-django-tagging','python-twisted','apache2','libapache2-mod-wsgi' ]
+$pip = ['whisper','carbon','graphite-web']
+
+exec { 'update_repos' : 
+  command => "apt-get update",
+#  onlyif => 'test $(( $(date +%s) - $(stat -c %Z /var/cache/apt/pkgcache.bin) )) -gt $(( 24 * 60 * 60 ))',
+}
+->
+package { 'python-software-properties' : ensure => present }
+->
+exec { 'add-collectd-repo' :
+  command => "add-apt-repository -y ppa:vbulax/collectd5",
+  unless => 'test -f /etc/apt/sources.list.d/vbulax-collectd5-precise.list',
+}
+->
+exec { 'update_repos_bis' : 
+  command => "apt-get update",
+#  onlyif => 'test $(( $(date +%s) - $(stat -c %Z /etc/magic) )) -gt $(( 24 * 60 * 60 ))',
+}
+->
+package { $packages : 
+  ensure => present,
+}
+->
+file { '/etc/collectd/collectd.conf' :
+  ensure => file,
+  source => '/vagrant/puppet/files/collectd.conf',
+  owner => "root",
+  group => "root",
+  mode => "0644",
+}
+->
+service { 'collectd' :
+  ensure     => running,
+  enable     => true,
+}
+->
+package { $pip :
+  ensure => present,
+  provider => pip,
+}
+->
+file { '/opt/graphite/conf/storage-schemas.conf' :
+  ensure => file,
+  source => '/vagrant/puppet/files/storage-schemas.conf',
+  owner => "root",
+  group => "root",
+  mode => "0644",
+}
+->
+file { '/opt/graphite/conf/carbon.conf' :
+  ensure => file,
+  source => '/vagrant/puppet/files/carbon.conf',
+  owner => "root",
+  group => "root",
+  mode => "0644",
+}
+->
+file { '/opt/graphite/webapp/graphite/local_settings.py' :
+  ensure => file,
+  source => '/vagrant/puppet/files/local_settings.py',
+  owner => "root",
+  group => "root",
+  mode => "0644",
+}
+->
+file { '/opt/graphite/conf/graphite.wsgi' :
+  ensure => file,
+  source => '/vagrant/puppet/files/graphite.wsgi',
+  owner => "root",
+  group => "root",
+  mode => "0644",
+}
+->
+exec { 'sync-graphite-webapp-db' : 
+  command => "python /opt/graphite/webapp/graphite/manage.py syncdb"
+}
+->
+file { '/opt/graphite/storage' :
+  owner => 'www-data',
+  group => 'www-data',
+  recurse => true,
+}
+->
+file { '/etc/apache2/sites-available/graphite' :
+  ensure => file,
+  source => '/vagrant/puppet/files/graphite-vhost.conf',
+  owner => "root",
+  group => "root",
+  mode => "0644",
+  notify => Service['apache2'],
+}
+->
+file { '/etc/apache2/sites-enabled/graphite' :
+  ensure => link,
+  target => '/etc/apache2/sites-available/graphite',
+  notify => Service['apache2'],
+}
+->
+file { '/etc/apache2/sites-enabled/000-default' :
+  ensure => absent,
+  notify => Service['apache2'],
+}
+->
+service { 'apache2' :
+  ensure     => running,
+  enable     => true,
+}
+->
+service { 'carbon-cache':
+  ensure     => running,
+  provider   => base,
+  binary     => '/opt/graphite/bin/carbon-cache.py',
+  start      => '/opt/graphite/bin/carbon-cache.py start',
+  status     => '/opt/graphite/bin/carbon-cache.py status',
+  hasstatus  => true,
+}

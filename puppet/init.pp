@@ -9,9 +9,6 @@ apt::ppa { 'ppa:vbulax/collectd5':
 }
 
 class { '::collectd': }
-class { 'collectd::plugin::write_graphite':
-  graphitehost => '127.0.0.1',
-}
 class { 'collectd::plugin::amqp':
   amqphost => '127.0.0.1',
 }
@@ -19,6 +16,12 @@ class { 'collectd::plugin::amqp':
 class { 'graphite':
   gr_timezone => 'Europe/Madrid',
   secret_key => "claveSecreeeeeta",
+  gr_amqp_enable => 'True',
+  gr_amqp_vhost => 'graphite',
+  gr_amqp_user => 'graphite',
+  gr_amqp_password => 'graphite',
+  gr_amqp_exchange => 'metrics',
+  gr_amqp_metric_name_in_body => 'True',
   require => Class['apt'],
 }
 

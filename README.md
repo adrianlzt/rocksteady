@@ -1,15 +1,21 @@
 rocksteady
 ==========
 
-Testing rocksteady monitoring solution
-https://code.google.com/p/rocksteady/
+Testing [rocksteady](https://code.google.com/p/rocksteady/) monitoring solution
 
-Arrancar entorno:
+
+### Requisitos:
+ - vagrant
+ - vagrant-lxc: ``vagrant plugin install vagrant-lxc``
+ - bsdtar: ``apt-get install bsdtar``
+ - librarian-puppet: ``gem install librarian-puppet``
+
+### Arrancar entorno:
 ```
-apt-get install bsdtar
 librarian-puppet install
 vagrant up --provider=lxc --provision
 ```
+
 [Acceder a graphite](http://localhost:8080)
 
 La idea es tener un sistema con collectd + graphite.

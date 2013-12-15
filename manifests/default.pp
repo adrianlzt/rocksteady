@@ -59,3 +59,4 @@ class { 'java':
   require => Class['apt'],
 }
 
+class { "maven::maven": }

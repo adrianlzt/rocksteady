@@ -6,13 +6,14 @@ VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "precise_lxc"
+  config.vm.box_url = "http://bit.ly/vagrant-lxc-precise64-2013-10-23"
 
   config.vm.hostname = "rocksteady.com"
 
-  config.vm.provision :puppet do |puppet|
-    puppet.manifests_path = 'puppet/'
-    puppet.manifest_file = 'init.pp'
-    puppet.module_path = 'puppet/modules'
+  config.vm.network :forwarded_port, guest: 80, host: 8080
+
+  config.vm.provision "puppet" do |puppet|
+    puppet.module_path = "modules"
   end
 
 end

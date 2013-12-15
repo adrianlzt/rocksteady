@@ -3,6 +3,10 @@ rocksteady
 
 Testing [rocksteady](https://code.google.com/p/rocksteady/) monitoring solution
 
+Rocksteady lleva desde enero de 2011 sin desarrollo.
+
+Para terminar de instalar quedaba importar el esquema de la base de datos, bajar el código fuente y ejecutar.
+
 
 ### Requisitos:
  - vagrant

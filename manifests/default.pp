@@ -59,4 +59,16 @@ class { 'java':
   require => Class['apt'],
 }
 
-class { "maven::maven": }
+class { "maven::maven": 
+  require => Class['apt'],
+}
+
+class { '::mysql::server':
+  require => Class['apt'],
+}
+->
+mysql::db { 'rocksteady':
+  user     => 'rocksteady',
+  password => 'rocksteady',
+  host     => 'localhost',
+}

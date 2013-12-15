@@ -52,3 +52,10 @@ rabbitmq_user_permissions { 'graphite@graphite':
   require => Class['::rabbitmq'],
 }
 
+# Rocksteady dependencies
+
+class { 'java': 
+  distribution => 'jre',
+  require => Class['apt'],
+}
+

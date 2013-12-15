@@ -52,3 +52,23 @@ rabbitmq_user_permissions { 'graphite@graphite':
   require => Class['::rabbitmq'],
 }
 
+# Rocksteady dependencies
+
+class { 'java': 
+  distribution => 'jre',
+  require => Class['apt'],
+}
+
+class { "maven::maven": 
+  require => Class['apt'],
+}
+
+class { '::mysql::server':
+  require => Class['apt'],
+}
+->
+mysql::db { 'rocksteady':
+  user     => 'rocksteady',
+  password => 'rocksteady',
+  host     => 'localhost',
+}

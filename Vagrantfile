@@ -10,6 +10,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.hostname = "rocksteady.com"
 
+  config.vm.network :forwarded_port, guest: 80, host: 8080
+
   config.vm.provision "puppet" do |puppet|
     puppet.module_path = "modules"
   end

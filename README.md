@@ -10,6 +10,7 @@ apt-get install bsdtar
 librarian-puppet install
 vagrant up --provider=lxc --provision
 ```
+[Acceder a graphite](http://localhost:8080)
 
 La idea es tener un sistema con collectd + graphite.
 

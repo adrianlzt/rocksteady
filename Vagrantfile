@@ -10,10 +10,5 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.hostname = "rocksteady.com"
 
-  config.vm.provision :puppet do |puppet|
-    puppet.manifests_path = 'puppet/'
-    puppet.manifest_file = 'init.pp'
-    puppet.module_path = 'puppet/modules'
-  end
-
+  config.vm.provision :puppet
 end
